@@ -1,7 +1,7 @@
 clear all;close all;clc
 
 %%
-duration = [20, 40, 80, 160, 250, 350]; % ms
+duration = [1,5,10, 20,30, 40,50,60,70, 80, 160, 250, 350]; % ms
 contrast = [1, 4, 8, 16, 32, 52, 100];
 
 nDur = length(duration);
@@ -44,7 +44,7 @@ myplot(duration, (x2./(x1+x2))', [], '-bo');
 title('Low contrast');
 xlabel('Duration (ms)');
 ylabel('Energy');
-set(gca, 'XScale', 'log');
+%set(gca, 'XScale', 'log');
 
 
 x3 = squeeze(motionEnergy(:, end, 1));
@@ -56,4 +56,4 @@ myplot(duration, (x4./(x3+x4))', [], '-bo');
 title('High contrast');
 xlabel('Duration (ms)');
 ylabel('Energy');
-set(gca, 'XScale', 'log');
+%set(gca, 'XScale', 'log');

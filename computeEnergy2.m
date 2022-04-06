@@ -14,18 +14,18 @@ clc;
 
 warning('off','MATLAB:dispatcher:InexactMatch');
 
-if notDefined('duration')
-    duration = 50;
-end
-if notDefined('speed')
-    speed = 5.66;
-end
-if notDefined('contrast')
-    contrast = 100;
-end
-if notDefined('wantfig')
+%if notDefined('duration')
+%    duration = 50;
+%end
+%if notDefined('speed')
+%    speed = 5.66;
+%end
+%if notDefined('contrast')
+%   contrast = 100;
+%end
+%if notDefined('wantfig')
     wantfig = 0;
-end
+%end
 
 
 
