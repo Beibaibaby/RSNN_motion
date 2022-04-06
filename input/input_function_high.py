@@ -19,7 +19,7 @@ high_contrast_ratio[0:9]=high_contrast_ratio[9]
 
 
 def objective(x, R_max, c_1,c_2):
-	return R_max*(c_1**x/(c_2**x+c_1**x))+0.5245574511312125
+	return R_max*(c_1**x/(c_2**x+c_1**x))+0.2
 
 x=[0 + x*(low_contrast_ratio.shape[0]-0)/low_contrast_ratio.shape[0] for x in range(low_contrast_ratio.shape[0])]
 x=np.asarray(x)
@@ -27,7 +27,7 @@ popt, _ = curve_fit(objective, x, high_contrast_ratio)
 
 R_max, c_1,c_2 = popt
 
-print(R_max)
+print(popt)
 
 mymodel = np.poly1d(np.polyfit(x, low_contrast_ratio,5))
 
