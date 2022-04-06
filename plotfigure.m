@@ -1,9 +1,9 @@
 clear all;close all;clc
 
 %%
-duration = [1,5,10, 20,30, 40,50,60,70, 80, 160, 250, 350]; % ms
+duration = 1:350; % ms
+%duration = duration*10
 contrast = [1, 4, 8, 16, 32, 52, 100];
-
 nDur = length(duration);
 nConst = length(contrast);
 %%
@@ -14,6 +14,8 @@ for i=1:nDur
     end
 end
 
+%%
+save('motionEnergy.mat','motionEnergy')
 %%
 close all;
 cpsfigure(1,2);
