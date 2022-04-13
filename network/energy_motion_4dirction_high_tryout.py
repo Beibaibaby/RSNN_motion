@@ -33,10 +33,10 @@ R_max, c_1,c_2 = popt
 
 def input_function(R_max, c_1,c_2,cprime):
     ratio = objective([0 + x for x in range(600)], R_max, c_1,c_2)
-    right = cprime*ratio*0.9*60
-    left = cprime*(1-ratio)*0.9*60
-    up = cprime*0.05*(np.zeros(left.shape)+1)*60
-    down = cprime*0.05*(np.zeros(left.shape)+1)*60
+    right = cprime*ratio*0.85*60
+    left = cprime*(1-ratio)*0.85*60
+    up = cprime*0.075*(np.zeros(left.shape)+1)*60
+    down = cprime*0.075*(np.zeros(left.shape)+1)*60
     return left,right,up,down
 
 #print(input_function(R_max,c_1,c_2,0.99))
@@ -50,8 +50,8 @@ taus = 100 * 10 ** -3
 tauampa = 2 * 10 ** -3
 Je = 0.3103
 Jot = -0.007
-Jop = -0.048
-
+Jop = -0.042
+sum_plot=0
 (J11,J12,J13,J14) = (Je,Jot,Jop,Jot)
 (J21,J22,J23,J24) = (Jot,Je,Jot,Jop)
 (J31,J32,J33,J34) = (Jop,Jot,Je,Jot)
@@ -193,7 +193,7 @@ def smoothing(data):
 
 
 plt.figure
-sum_plot=0
+
 iter=1
 for cprime in [0.99]:
   if sum_plot==0:
@@ -219,7 +219,7 @@ for cprime in [0.99]:
     plt.title('Contrast-' + str(cprime) + ' Iteration-' + str(iter) + ' Firing Rate')
     # plt.text(-125, 16, 'Threshold')
     plt.legend()
-    plt.savefig('./figs/firing_rate_' + str(cprime) + '.png')
+    plt.savefig('./figs/tryout_firing_rate_' + str(cprime) + '.png')
     plt.show()
   elif sum_plot== 1:
     for i in range(iter):
@@ -320,5 +320,5 @@ for cprime in [0.99]:
       plt.title('Contrast-'+str(cprime)+' Iteration-'+str(iter)+' Decision Making')
       # plt.text(-125, 16, 'Threshold')
       plt.legend()
-      plt.savefig('./figs/psychophysics_'+str(cprime)+'.png')
+      plt.savefig('./figs/try_out_psychophysics_'+str(cprime)+'.png')
       plt.show()
