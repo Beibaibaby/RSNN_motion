@@ -33,10 +33,10 @@ R_max, c_1,c_2 = popt
 
 def input_function(R_max, c_1,c_2,cprime):
     ratio = objective([0 + x for x in range(600)], R_max, c_1,c_2)
-    right = cprime*ratio+0.95
-    left = cprime*(1-ratio)*0.95
-    up = cprime*0.025*(np.zeros(left.shape)+1)
-    down = cprime*0.025*(np.zeros(left.shape)+1)
+    right = cprime*ratio*0.9*60
+    left = cprime*(1-ratio)*0.9*60
+    up = cprime*0.05*(np.zeros(left.shape)+1)*60
+    down = cprime*0.05*(np.zeros(left.shape)+1)*60
     return left,right,up,down
 
 #print(input_function(R_max,c_1,c_2,0.99))
@@ -48,9 +48,9 @@ d = 0.154
 gamma = 0.641
 taus = 100 * 10 ** -3
 tauampa = 2 * 10 ** -3
-Je = 0.3109
-Jot = -0.00697
-Jop = -0.0097
+Je = 0.3103
+Jot = -0.0185
+Jop = -0.0185
 
 (J11,J12,J13,J14) = (Je,Jot,Jop,Jot)
 (J21,J22,J23,J24) = (Jot,Je,Jot,Jop)
@@ -72,7 +72,7 @@ def H(xi):
 
 
 starttime = -0.5
-endtime = 0.9
+endtime = 2
 steps = int(abs(starttime - endtime) / dt)
 time = np.linspace(starttime, endtime, steps)
 
@@ -193,8 +193,32 @@ def smoothing(data):
 
 plt.figure
 
-iter=500
+
+sum_plot=0
+iter=10
 for cprime in [0.05]:
+  if sum_plot==0:
+    for i in range(iter):
+        print(i)
+        result = experiment(cprime)
+        result = np.asarray(result)
+        if(i==0):
+            sum=np.zeros((4,25000))
+        else:
+            sum= sum +result
+        hue = ['orange', 'red', 'blue', 'green']
+        if (i == 0):
+            plt.plot(time * 1000, smoothing(result[0]), color=hue[0], label='left')
+            plt.plot(time * 1000, smoothing(result[1]), color=hue[1], label='up')
+            plt.plot(time * 1000, smoothing(result[2]), color=hue[2], label='right')
+            plt.plot(time * 1000, smoothing(result[3]), color=hue[3], label='down')
+        else:
+
+            plt.plot(time * 1000, smoothing(result[0]), color=hue[0])
+            plt.plot(time * 1000, smoothing(result[1]), color=hue[1])
+            plt.plot(time * 1000, smoothing(result[2]), color=hue[2])
+            plt.plot(time * 1000, smoothing(result[3]), color=hue[3])
+  else:
     for i in range(iter):
         print(i)
         result = experiment(cprime)
@@ -204,18 +228,8 @@ for cprime in [0.05]:
         else:
             sum= sum +result
         hue = ['orange', 'red', 'blue', 'green']
-        #if (i == 0):
-            #plt.plot(time * 1000, smoothing(result[0]), color=hue[0], label='left')
-            #plt.plot(time * 1000, smoothing(result[1]), color=hue[1], label='up')
-            #plt.plot(time * 1000, smoothing(result[2]), color=hue[2], label='right')
-            #plt.plot(time * 1000, smoothing(result[3]), color=hue[3], label='down')
-        #else:
 
-            #plt.plot(time * 1000, smoothing(result[0]), color=hue[0])
-            #plt.plot(time * 1000, smoothing(result[1]), color=hue[1])
-            #plt.plot(time * 1000, smoothing(result[2]), color=hue[2])
-            #plt.plot(time * 1000, smoothing(result[3]), color=hue[3])
-    #rr=np.asarray(rr)
+
     sum=sum/iter
     plt.plot(time * 1000, smoothing(sum[0]), color=hue[0], label='left')
     plt.plot(time * 1000, smoothing(sum[1]), color=hue[1], label='up')
@@ -227,6 +241,5 @@ plt.ylabel('Firing rate(Hz)')
 # plt.ylim(0,40)
 #plt.text(-125, 16, 'Threshold')
 plt.legend()
-plt.savefig('./figs/low_500iter.png')
+plt.savefig('./figs/low_smalllook.png')
 plt.show()
-

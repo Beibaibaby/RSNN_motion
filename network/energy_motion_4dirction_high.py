@@ -193,7 +193,7 @@ def smoothing(data):
 
 
 plt.figure
-sum_plot=0
+sum_plot=2
 iter=5
 for cprime in [1]:
   if sum_plot==0:
@@ -217,7 +217,15 @@ for cprime in [1]:
             plt.plot(time * 1000, smoothing(result[1]), color=hue[1])
             plt.plot(time * 1000, smoothing(result[2]), color=hue[2])
             plt.plot(time * 1000, smoothing(result[3]), color=hue[3])
-  else:
+    plt.xlabel('Time(ms)')
+    plt.ylabel('Firing rate(Hz)')
+    # plt.ylim(0,20)
+    # plt.xlim(-600,750)
+    # plt.text(-125, 16, 'Threshold')
+    plt.legend()
+    plt.savefig('./figs/high_500iterations.png')
+    plt.show()
+  elif sum_plot== 1:
     for i in range(iter):
         print(i)
         result = experiment(cprime)
@@ -234,14 +242,41 @@ for cprime in [1]:
     plt.plot(time * 1000, smoothing(sum[1]), color=hue[1], label='up')
     plt.plot(time * 1000, smoothing(sum[2]), color=hue[2], label='right')
     plt.plot(time * 1000, smoothing(sum[3]), color=hue[3], label='down')
+    plt.xlabel('Time(ms)')
+    plt.ylabel('Firing rate(Hz)')
+    # plt.ylim(0,20)
+    # plt.xlim(-600,750)
+    # plt.text(-125, 16, 'Threshold')
+    plt.legend()
+    plt.savefig('./figs/high_500iterations.png')
+    plt.show()
+  elif sum_plot == 2:
+      from scipy.special import softmax
 
+
+      for i in range(iter):
+          print(i)
+          result = experiment(cprime)
+          result = np.asarray(result)
+          result = softmax(result, axis=0)
+          hue = ['orange', 'red', 'blue', 'green']
+          if (i == 0):
+              plt.plot(time * 1000, smoothing(result[0]), color=hue[0], label='left')
+              plt.plot(time * 1000, smoothing(result[1]), color=hue[1], label='up')
+              plt.plot(time * 1000, smoothing(result[2]), color=hue[2], label='right')
+              plt.plot(time * 1000, smoothing(result[3]), color=hue[3], label='down')
+          else:
+
+              plt.plot(time * 1000, smoothing(result[0]), color=hue[0])
+              plt.plot(time * 1000, smoothing(result[1]), color=hue[1])
+              plt.plot(time * 1000, smoothing(result[2]), color=hue[2])
+              plt.plot(time * 1000, smoothing(result[3]), color=hue[3])
 #plt.plot(time * 1000, 15 * np.ones(steps))
-plt.xlabel('Time(ms)')
-plt.ylabel('Firing rate(Hz)')
-#plt.ylim(0,20)
-#plt.xlim(-600,750)
-#plt.text(-125, 16, 'Threshold')
-plt.legend()
-plt.savefig('./figs/high_500iterations.png')
-plt.show()
+      plt.xlabel('Time(ms)')
+      plt.ylabel('Pro')
+      plt.xlim(-600,500)
+      # plt.text(-125, 16, 'Threshold')
+      plt.legend()
+      plt.savefig('./figs/high_500iterations.png')
+      plt.show()
 
