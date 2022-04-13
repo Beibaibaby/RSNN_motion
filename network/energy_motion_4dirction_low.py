@@ -194,8 +194,10 @@ def smoothing(data):
 plt.figure
 hue = ['orange', 'red', 'blue', 'green']
 
-sum_plot=0
-iter=1
+sum_plot=4
+#3 decision with smoothing
+
+iter=500
 for cprime in [0.05]:
   if sum_plot==0:
     for i in range(iter):
@@ -324,4 +326,53 @@ for cprime in [0.05]:
       # plt.text(-125, 16, 'Threshold')
       plt.legend()
       plt.savefig('./figs/psychophysics_'+str(cprime)+'.png')
+      plt.show()
+  elif sum_plot == 4:
+      from scipy.special import softmax
+      left_con = []
+      up_con=[]
+      right_con=[]
+      down_con=[]
+
+      for i in range(iter):
+          print(i)
+          result = experiment(cprime)
+          result = np.asarray(result)
+          result = softmax(result, axis=0)
+          hue = ['orange', 'red', 'blue', 'green']
+          left_con.append(smoothing(result[0]))
+          up_con.append(smoothing(result[1]))
+          right_con.append(smoothing(result[2]))
+          down_con.append(smoothing(result[3]))
+
+      left_con=np.asarray(left_con)
+      left_mean=left_con.mean(axis=0)
+      left_var = left_con.var(axis=0)
+
+      right_con=np.asarray(right_con)
+      right_mean=right_con.mean(axis=0)
+      right_var = right_con.var(axis=0)
+
+      up_con = np.asarray(up_con)
+      up_mean = up_con.mean(axis=0)
+      up_var = up_con.var(axis=0)
+
+      down_con = np.asarray(down_con)
+      down_mean = down_con.mean(axis=0)
+      down_var = down_con.var(axis=0)
+      plt.plot(time * 1000, left_mean, color=hue[0], label='left')
+      plt.plot(time * 1000, up_mean, color=hue[1], label='up')
+      plt.plot(time * 1000, right_mean, color=hue[2], label='right')
+      plt.plot(time * 1000, down_mean, color=hue[3], label='down')
+      plt.fill_between(time * 1000, left_mean-left_var, left_mean+left_var, color=hue[0],alpha=0.3)
+      plt.fill_between(time * 1000, up_mean - up_var, up_mean + up_var, color=hue[1], alpha=0.3)
+      plt.fill_between(time * 1000, right_mean - right_var, right_mean + right_var, color=hue[2], alpha=0.3)
+      plt.fill_between(time * 1000, down_mean - down_var, down_mean + down_var, color=hue[3], alpha=0.3)
+      # plt.plot(time * 1000, 15 * np.ones(steps))
+      plt.xlabel('Time(ms)')
+      plt.ylabel('Pro')
+      plt.title('Contrast-'+str(cprime)+' Iteration-'+str(iter)+' Decision Making(Smoothing)')
+      # plt.text(-125, 16, 'Threshold')
+      plt.legend()
+      plt.savefig('./figs/psychophysics_'+str(cprime)+'_smoothing.png')
       plt.show()
