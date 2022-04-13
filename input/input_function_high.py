@@ -26,8 +26,8 @@ x=np.asarray(x)
 popt, _ = curve_fit(objective, x, high_contrast_ratio)
 
 R_max, c_1,c_2 = popt
-
 print(popt)
+
 
 mymodel = np.poly1d(np.polyfit(x, low_contrast_ratio,5))
 
