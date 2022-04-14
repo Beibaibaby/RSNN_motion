@@ -32,15 +32,28 @@ R_max, c_1,c_2 = popt
 
 
 def input_function(R_max, c_1,c_2,cprime):
-    ratio = objective([0 + x for x in range(600)], R_max, c_1,c_2)
+    ratio = objective([0 + x for x in range(350)], R_max, c_1,c_2)
     right = cprime*ratio*0.9*60
     left = cprime*(1-ratio)*0.9*60
     up = cprime*0.05*(np.zeros(left.shape)+1)*60
     down = cprime*0.05*(np.zeros(left.shape)+1)*60
     return left,right,up,down
-
+hue = ['orange', 'red', 'blue', 'green']
+plt.figure
+left,right,up,down =input_function(R_max, c_1,c_2,0.05)
 #print(input_function(R_max,c_1,c_2,0.99))
-
+plt.plot([0 + x for x in range(350)], left, color=hue[0], label='left')
+plt.plot([0 + x for x in range(350)], up, label='up')
+plt.plot([0 + x for x in range(350)], right, label='right')
+plt.plot([0 + x for x in range(350)], down, label='down')
+plt.xlabel('Time')
+plt.ylabel('Input')
+# plt.ylim(0,20)
+# plt.xlim(-600,750)
+# plt.text(-125, 16, 'Threshold')
+plt.legend()
+plt.savefig('./figs/input_low.png')
+plt.show()
 
 a = 270
 b = 108

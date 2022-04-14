@@ -39,6 +39,8 @@ def input_function(R_max, c_1,c_2,cprime):
     down = cprime*0.05*(np.zeros(left.shape)+1)*60
     return left,right,up,down
 
+
+
 #print(input_function(R_max,c_1,c_2,0.99))
 
 
