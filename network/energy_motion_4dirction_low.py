@@ -40,12 +40,20 @@ def input_function(R_max, c_1,c_2,cprime):
     return left,right,up,down
 hue = ['orange', 'red', 'blue', 'green']
 plt.figure
+def tuningc(degree, cprime):
+    realdegree = 0
+    r0 = 20
+    r1 = 0
+    r2 = 100
+    sigma = 40
+    v = r0 + cprime * (-r1 + r2 * math.e ** (-(degree - realdegree) ** 2 / (sigma ** 2)))
+    return v
 left,right,up,down =input_function(R_max, c_1,c_2,0.05)
 #print(input_function(R_max,c_1,c_2,0.99))
 plt.plot([0 + x for x in range(350)], left, color=hue[0], label='left')
-plt.plot([0 + x for x in range(350)], up, label='up')
-plt.plot([0 + x for x in range(350)], right, label='right')
-plt.plot([0 + x for x in range(350)], down, label='down')
+plt.plot([0 + x for x in range(350)], up, color=hue[1],label='up')
+plt.plot([0 + x for x in range(350)], right, color=hue[2] ,label='right')
+plt.plot([0 + x for x in range(350)], down, color=hue[3] ,label='down')
 plt.xlabel('Time')
 plt.ylabel('Input')
 # plt.ylim(0,20)
@@ -61,9 +69,13 @@ d = 0.154
 gamma = 0.641
 taus = 100 * 10 ** -3
 tauampa = 2 * 10 ** -3
+#Je = 0.3103
+#Jot = -0.0185
+#Jop = -0.0185
+
 Je = 0.3103
-Jot = -0.0185
-Jop = -0.0185
+Jot = -0.007
+Jop = -0.048
 
 (J11,J12,J13,J14) = (Je,Jot,Jop,Jot)
 (J21,J22,J23,J24) = (Jot,Je,Jot,Jop)
@@ -207,10 +219,10 @@ def smoothing(data):
 plt.figure
 hue = ['orange', 'red', 'blue', 'green']
 
-sum_plot=4
+sum_plot=0
 #3 decision with smoothing
 
-iter=500
+iter=1
 for cprime in [0.05]:
   if sum_plot==0:
     for i in range(iter):
