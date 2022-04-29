@@ -6,6 +6,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+
+
+contrast = 0.99
+sum_plot=0
+#3 decision with smoothing
+
+iter=1
+
 mat = scipy.io.loadmat('motionEnergy.mat')
 data= mat['motionEnergy']
 time_step,contrast_=data.shape[0],data.shape[1]
@@ -26,25 +34,68 @@ def objective(x, R_max, c_1,c_2):
 
 x=[0 + x*(low_contrast_ratio.shape[0]-0)/low_contrast_ratio.shape[0] for x in range(low_contrast_ratio.shape[0])]
 x=np.asarray(x)
-popt, _ = curve_fit(objective, x, high_contrast_ratio)
-
+if contrast == 0.05:
+    popt, _ = curve_fit(objective, x, low_contrast_ratio)
+else:
+    popt, _ = curve_fit(objective, x, high_contrast_ratio)
 R_max, c_1,c_2 = popt
+
+def convolve(x,covk):
+    r=np.zeros(x.shape)
+    for i in range(len(x)):
+        xx=0
+        for j in range(len(covk)):
+            xx=x[i]
 
 
 def input_function(R_max, c_1,c_2,cprime):
-    ratio = objective([0 + x for x in range(600)], R_max, c_1,c_2)
+    ratio = objective([0 + x for x in range(350)], R_max, c_1,c_2)
     right = cprime*ratio*0.9*60
-    left = cprime*(1-ratio)*0.9*60
+
+
+    cov_c = np.asarray([0.1, 0.097, 0.089, 0.083, 0.08, 0.076, 0.088, 0.089, 0.092, 0.1])
+    #left = cprime * (1 - ratio) * 0.9 * 60
+
+    right = np.convolve(right, cov_c, 'same')
+    for i in range(5):
+        right[i]=right[5]
+        right[len(right)-i-1]=right[len(right)-6]
+    left = cprime * (1 - ratio) * 0.9 * 60
+    for i in range(80):
+        left[i+1]=left[1]+0.1
+
+    for i in range(100):
+        left[60+i]=left[200]
+
     up = cprime*0.05*(np.zeros(left.shape)+1)*60
     down = cprime*0.05*(np.zeros(left.shape)+1)*60
-    cov_c = np.asarray([0.1, 0.1, 0.1, 0.09, 0.08, 0.08, 0.09, 0.1, 0.1, 0.1])
-    right = np.convolve(right, cov_c, 'same')
+    print(right)
     return left,right,up,down
 
-
-
+hue = ['orange', 'red', 'blue', 'green']
+plt.figure
+def tuningc(degree, cprime):
+    realdegree = 0
+    r0 = 20
+    r1 = 0
+    r2 = 100
+    sigma = 40
+    v = r0 + cprime * (-r1 + r2 * math.e ** (-(degree - realdegree) ** 2 / (sigma ** 2)))
+    return v
+left,right,up,down =input_function(R_max, c_1,c_2,0.05)
 #print(input_function(R_max,c_1,c_2,0.99))
-
+plt.plot([0 + x for x in range(350)], left, color=hue[0], label='left')
+plt.plot([0 + x for x in range(350)], up, color=hue[1],label='up')
+plt.plot([0 + x for x in range(350)], right, color=hue[2] ,label='right')
+plt.plot([0 + x for x in range(350)], down, color=hue[3] ,label='down')
+plt.xlabel('Time')
+plt.ylabel('Input')
+# plt.ylim(0,20)
+# plt.xlim(-600,750)
+# plt.text(-125, 16, 'Threshold')
+plt.legend()
+plt.savefig('./figs/input.png')
+plt.show()
 
 a = 270
 b = 108
@@ -52,6 +103,10 @@ d = 0.154
 gamma = 0.641
 taus = 100 * 10 ** -3
 tauampa = 2 * 10 ** -3
+#Je = 0.3103
+#Jot = -0.0185
+#Jop = -0.0185
+
 Je = 0.3103
 Jot = -0.007
 Jop = -0.048
@@ -76,10 +131,11 @@ def H(xi):
 
 
 starttime = -0.5
-endtime = 5
+endtime = 2
 steps = int(abs(starttime - endtime) / dt)
 time = np.linspace(starttime, endtime, steps)
-print(time.shape)
+
+
 
 
 
@@ -197,20 +253,13 @@ def smoothing(data):
 plt.figure
 hue = ['orange', 'red', 'blue', 'green']
 
-sum_plot=0
-#3 decision with smoothing
 
-iter=5
-for cprime in [0.99]:
+for cprime in [contrast]:
   if sum_plot==0:
     for i in range(iter):
         print(i)
         result = experiment(cprime)
         result = np.asarray(result)
-        if(i==0):
-            sum=np.zeros((4,55000))
-        else:
-            sum= sum +result
         hue = ['orange', 'red', 'blue', 'green']
         if (i == 0):
             plt.plot(time * 1000, result[0], color=hue[0], label='left')

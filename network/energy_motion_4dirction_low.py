@@ -99,7 +99,7 @@ def H(xi):
 
 
 starttime = -0.5
-endtime = 2
+endtime = 3
 steps = int(abs(starttime - endtime) / dt)
 time = np.linspace(starttime, endtime, steps)
 
@@ -221,10 +221,10 @@ def smoothing(data):
 plt.figure
 hue = ['orange', 'red', 'blue', 'green']
 
-sum_plot=4
+sum_plot=0
 #3 decision with smoothing
 
-iter=50
+iter=5
 for cprime in [0.05]:
   if sum_plot==0:
     for i in range(iter):
@@ -232,7 +232,7 @@ for cprime in [0.05]:
         result = experiment(cprime)
         result = np.asarray(result)
         if(i==0):
-            sum=np.zeros((4,25000))
+            sum=np.zeros((4,35000))
         else:
             sum= sum +result
         hue = ['orange', 'red', 'blue', 'green']
