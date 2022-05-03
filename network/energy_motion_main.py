@@ -11,8 +11,10 @@ from scipy.optimize import curve_fit
 contrast = 0.99
 sum_plot=0
 #3 decision with smoothing
-
-iter=1
+cov=True
+check=False
+check_reverse=False
+iter=100
 
 mat = scipy.io.loadmat('motionEnergy.mat')
 data= mat['motionEnergy']
@@ -51,29 +53,30 @@ def convolve(x,covk):
 def input_function(R_max, c_1,c_2,cprime):
     ratio = objective([0 + x for x in range(350)], R_max, c_1,c_2)
     right = cprime*ratio*0.9*60
-
-
-    cov_c = np.asarray([0.1, 0.097, 0.089, 0.083, 0.08, 0.076, 0.088, 0.089, 0.092, 0.1])
+    left = cprime * (1 - ratio) * 0.9 * 60
+    if cov==True:
+      cov_c = np.asarray([0.1, 0.097, 0.089, 0.083, 0.08, 0.076, 0.088, 0.089, 0.092, 0.1])
     #left = cprime * (1 - ratio) * 0.9 * 60
 
-    right = np.convolve(right, cov_c, 'same')
-    for i in range(5):
-        right[i]=right[5]
-        right[len(right)-i-1]=right[len(right)-6]
-    left = cprime * (1 - ratio) * 0.9 * 60
-    for i in range(80):
-        left[i+1]=left[1]+0.1
+      right = np.convolve(right, cov_c, 'same')
 
-    for i in range(100):
-        left[60+i]=left[200]
+      for i in range(5):
+          right[i] = right[5]
+          right[len(right) - i - 1] = right[len(right) - 6]
+
+      #for i in range(80):
+      #    left[i] = left[0]
+
+      #for i in range(100):
+      #    left[60 + i] = left[200]
 
     up = cprime*0.05*(np.zeros(left.shape)+1)*60
     down = cprime*0.05*(np.zeros(left.shape)+1)*60
-    print(right)
+    #print(right)
     return left,right,up,down
 
 hue = ['orange', 'red', 'blue', 'green']
-plt.figure
+
 def tuningc(degree, cprime):
     realdegree = 0
     r0 = 20
@@ -82,20 +85,25 @@ def tuningc(degree, cprime):
     sigma = 40
     v = r0 + cprime * (-r1 + r2 * math.e ** (-(degree - realdegree) ** 2 / (sigma ** 2)))
     return v
+
 left,right,up,down =input_function(R_max, c_1,c_2,0.05)
 #print(input_function(R_max,c_1,c_2,0.99))
-plt.plot([0 + x for x in range(350)], left, color=hue[0], label='left')
-plt.plot([0 + x for x in range(350)], up, color=hue[1],label='up')
-plt.plot([0 + x for x in range(350)], right, color=hue[2] ,label='right')
-plt.plot([0 + x for x in range(350)], down, color=hue[3] ,label='down')
-plt.xlabel('Time')
-plt.ylabel('Input')
+plt.figure
+
+fig, axs = plt.subplots(3)
+fig.set_size_inches(10.5, 18.5)
+axs[0].plot([0 + x for x in range(350)], left, color=hue[0], label='left')
+axs[0].plot([0 + x for x in range(350)], up, color=hue[1],label='up')
+axs[0].plot([0 + x for x in range(350)], right, color=hue[2] ,label='right')
+axs[0].plot([0 + x for x in range(350)], down, color=hue[3] ,label='down')
+
+axs[0].set(xlabel='x-label', ylabel='y-label')
 # plt.ylim(0,20)
 # plt.xlim(-600,750)
 # plt.text(-125, 16, 'Threshold')
-plt.legend()
-plt.savefig('./figs/input.png')
-plt.show()
+#plt.legend()
+#plt.savefig('./figs/input.png')
+#plt.show()
 
 a = 270
 b = 108
@@ -109,7 +117,7 @@ tauampa = 2 * 10 ** -3
 
 Je = 0.3103
 Jot = -0.007
-Jop = -0.048
+Jop = -0.057
 
 (J11,J12,J13,J14) = (Je,Jot,Jop,Jot)
 (J21,J22,J23,J24) = (Jot,Je,Jot,Jop)
@@ -200,7 +208,7 @@ def experiment(cprime):
                  + Inoise4[index]
 
 
-        else:
+        else :
             x1 = J11 * S1[index] + J12 * S2[index] + J13 * S3[index] + J14 * S4[index] + I0
 
             x2 = J21 * S1[index] + J22 * S2[index] + J23 * S3[index] + J24 * S4[index] + I0
@@ -250,34 +258,107 @@ def smoothing(data):
     return smoothed_data
 
 
-plt.figure
+
 hue = ['orange', 'red', 'blue', 'green']
 
 
 for cprime in [contrast]:
   if sum_plot==0:
+    from scipy.special import softmax
+
+    left_con = []
+    up_con = []
+    right_con = []
+    down_con = []
     for i in range(iter):
+
         print(i)
         result = experiment(cprime)
         result = np.asarray(result)
+
+        print(result.shape)
+        result1=result[:,:5000]
+        result2=result[:,5000:]
+
+        for idd in range(4):
+             result2[idd]=smoothing(result2[idd])
+        result=np.concatenate((result1, result2), axis=1)
+        if check==True:
+            if contrast == 0.99:
+                if result[0, 24000] > 5:
+                    continue
+        if check_reverse == True:
+            if contrast == 0.99:
+                if result[0, 24000] <=5:
+                    continue
+
+        print(result.shape)
         hue = ['orange', 'red', 'blue', 'green']
         if (i == 0):
-            plt.plot(time * 1000, result[0], color=hue[0], label='left')
-            plt.plot(time * 1000, result[1], color=hue[1], label='up')
-            plt.plot(time * 1000, result[2], color=hue[2], label='right')
-            plt.plot(time * 1000, result[3], color=hue[3], label='down')
+            axs[1].plot(time * 1000, result[0], color=hue[0], label='left')
+            axs[1].plot(time * 1000, result[1], color=hue[1], label='up')
+            axs[1].plot(time * 1000, result[2], color=hue[2], label='right')
+            axs[1].plot(time * 1000, result[3], color=hue[3], label='down')
         else:
 
-            plt.plot(time * 1000, result[0], color=hue[0])
-            plt.plot(time * 1000, result[1], color=hue[1])
-            plt.plot(time * 1000, result[2], color=hue[2])
-            plt.plot(time * 1000, result[3], color=hue[3])
-    plt.xlabel('Time(ms)')
-    plt.ylabel('Firing rate(Hz)')
-    plt.title('Contrast-' + str(cprime) + ' Iteration-' + str(iter) + ' Firing Rate')
+            axs[1].plot(time * 1000, result[0], color=hue[0])
+            axs[1].plot(time * 1000, result[1], color=hue[1])
+            axs[1].plot(time * 1000, result[2], color=hue[2])
+            axs[1].plot(time * 1000, result[3], color=hue[3])
+        result_softmax = softmax(result, axis=0)
+
+        left_con.append(result_softmax[0])
+        up_con.append(result_softmax[1])
+        right_con.append(result_softmax[2])
+        down_con.append(result_softmax[3])
+
+
+    #plt.xlabel('Time(ms)')
+    #plt.ylabel('Firing rate(Hz)')
+    axs[1].set(xlabel='Time(ms)', ylabel='Time(ms)')
+    #plt.title('Contrast-' + str(cprime) + ' Iteration-' + str(iter) + ' Firing Rate')
     # plt.text(-125, 16, 'Threshold')
+
+
+
+
+
+
+
+    left_con = np.asarray(left_con)
+    left_mean = left_con.mean(axis=0)
+    left_var = left_con.var(axis=0)
+
+    right_con = np.asarray(right_con)
+    right_mean = right_con.mean(axis=0)
+    right_var = right_con.var(axis=0)
+
+    up_con = np.asarray(up_con)
+    up_mean = up_con.mean(axis=0)
+    up_var = up_con.var(axis=0)
+
+    down_con = np.asarray(down_con)
+    down_mean = down_con.mean(axis=0)
+    down_var = down_con.var(axis=0)
+    axs[2].plot(time * 1000, left_mean, color=hue[0], label='left')
+    axs[2].plot(time * 1000, up_mean, color=hue[1], label='up')
+    axs[2].plot(time * 1000, right_mean, color=hue[2], label='right')
+    axs[2].plot(time * 1000, down_mean, color=hue[3], label='down')
+    axs[2].fill_between(time * 1000, left_mean - left_var, left_mean + left_var, color=hue[0], alpha=0.3)
+    axs[2].fill_between(time * 1000, up_mean - up_var, up_mean + up_var, color=hue[1], alpha=0.3)
+    axs[2].fill_between(time * 1000, right_mean - right_var, right_mean + right_var, color=hue[2], alpha=0.3)
+    axs[2].fill_between(time * 1000, down_mean - down_var, down_mean + down_var, color=hue[3], alpha=0.3)
+    # plt.plot(time * 1000, 15 * np.ones(steps))
+    #.xlabel('Time(ms)')
+    #plt.ylabel('Pro')
+    #axs[2].set(xlabel='Time(ms)', ylabel='Time(ms)')
+    #plt.title('Contrast-' + str(cprime) + ' Iteration-' + str(iter) + ' Decision Making(Smoothing)')
+    # plt.text(-125, 16, 'Threshold')
+    #plt.legend()
+    #plt.savefig('./figs/psychophysics_' + str(cprime) + '_smoothing.png')
+    #plt.show()
     plt.legend()
-    plt.savefig('./figs/firing_rate_' + str(cprime) + '.png')
+    plt.savefig('./figs/allthree_' + str(cprime) + '.png')
     plt.show()
   elif sum_plot== 1:
     for i in range(iter):
