@@ -9,13 +9,13 @@ from scipy.optimize import curve_fit
 
 
 Je = 0.3103
-Jot = -0.007
-Jop = -0.046
+Jot = -0.023
+Jop = -0.041
 contrast = 0.99
 sum_plot=0
 #3 decision with smoothing
-cov=False
-check=False
+cov=True
+check=True
 check_reverse=False
 iter=1
 
@@ -55,8 +55,8 @@ def convolve(x,covk):
 
 def input_function(R_max, c_1,c_2,cprime):
     ratio = objective([0 + x for x in range(350)], R_max, c_1,c_2)
-    right = cprime*ratio*0.8*60
-    left = cprime * (1 - ratio) * 0.8 * 60
+    right = cprime*ratio*0.8*60 * 0.5
+    left = cprime * (1 - ratio) * 0.8 * 60*0.5
     if cov==True:
       cov_c = np.asarray([0.1, 0.097, 0.089, 0.083, 0.08, 0.076, 0.088, 0.089, 0.092, 0.1])
     #left = cprime * (1 - ratio) * 0.9 * 60
@@ -66,15 +66,16 @@ def input_function(R_max, c_1,c_2,cprime):
       for i in range(5):
           right[i] = right[5]
           right[len(right) - i - 1] = right[len(right) - 6]
-
+    left=left*0.8+0.3
+    right=right*0.8+0.3
       #for i in range(80):
       #    left[i] = left[0]
 
       #for i in range(100):
       #    left[60 + i] = left[200]
 
-    up = cprime*0.1*(np.zeros(left.shape)+1)*60
-    down = cprime*0.1*(np.zeros(left.shape)+1)*60
+    up = cprime*0.1*(np.zeros(left.shape)+1)*60+0.3
+    down = cprime*0.1*(np.zeros(left.shape)+1)*60+0.3
     #print(right)
     return left,right,up,down
 
@@ -190,21 +191,19 @@ def experiment(cprime):
         Inoise3[index + 1] = 0
         Inoise4[index + 1] = 0
         if t > 0 :
-                sks = 0
 
-           #if index>=5000 and index<5500:
-
-          #      x1 = J11 * S1[index] + J12 * S2[index] + J13 * S3[index] + J14 * S4[index] + I0 + Jext * mu1 \
-           #          + Inoise1[index]
-
-           #     x2 = x1
-            #    x3 = J31 * S1[index] + J32 * S2[index] + J33 * S3[index] + J34 * S4[index] + I0 + Jext * mu3 \
-            #         + Inoise3[index]
-            #    x4 = x1
+           if index==5000:
+                x1 = J11 * S1[index] + J12 * S2[index] + J13 * S3[index] + J14 * S4[index] + I0 + Jext * mu1 \
+                     + Inoise1[index]
+                x2 = x1
+                x3 = J31 * S1[index] + J32 * S2[index] + J33 * S3[index] + J34 * S4[index] + I0 + Jext * mu3 \
+                     + Inoise3[index]
+                x4 = x1
 
 
 
 
+           else:
                 x1 = J11 * S1[index] + J12 * S2[index] + J13 * S3[index] + J14 * S4[index] + I0 + Jext * mu1 \
                      + Inoise1[index]
 
