@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 
-
+cc=0.12
 Je = 0.3103
 Jot = -0.007
 Jop = -0.046
-contrast = 0.99
+contrast = 0.05
 sum_plot=0
 #3 decision with smoothing
 cov=True
@@ -55,8 +55,8 @@ def convolve(x,covk):
 
 def input_function(R_max, c_1,c_2,cprime):
     ratio = objective([0 + x for x in range(350)], R_max, c_1,c_2)
-    right = cprime*ratio*0.8*60
-    left = cprime * (1 - ratio) * 0.8 * 60
+    right = cprime**cc*ratio*0.8*60
+    left = cprime**cc * (1 - ratio) * 0.8 * 60
     if cov==True:
       cov_c = np.asarray([0.1, 0.097, 0.089, 0.083, 0.08, 0.076, 0.088, 0.089, 0.092, 0.1])
     #left = cprime * (1 - ratio) * 0.9 * 60
@@ -73,8 +73,8 @@ def input_function(R_max, c_1,c_2,cprime):
       #for i in range(100):
       #    left[60 + i] = left[200]
 
-    up = cprime*0.1*(np.zeros(left.shape)+1)*60
-    down = cprime*0.1*(np.zeros(left.shape)+1)*60
+    up = cprime**cc*0.1*(np.zeros(left.shape)+1)*60
+    down = cprime**cc*0.1*(np.zeros(left.shape)+1)*60
     #print(right)
     return left,right,up,down
 
@@ -308,6 +308,7 @@ for cprime in [contrast]:
         print(result.shape)
         hue = ['orange', 'red', 'blue', 'green']
         time=time+0.1
+        axs[1].set_xlim(-500, 500)
         if (i == 0):
             axs[1].plot(time * 1000, result[0], color=hue[0], label='left')
             axs[1].plot(time * 1000, result[1], color=hue[1], label='up')
@@ -315,10 +316,10 @@ for cprime in [contrast]:
             axs[1].plot(time * 1000, result[3], color=hue[3], label='down')
         else:
 
-            axs[1].plot(time * 1000, result[0], color=hue[0])
-            axs[1].plot(time * 1000, result[1], color=hue[1])
-            axs[1].plot(time * 1000, result[2], color=hue[2])
-            axs[1].plot(time * 1000, result[3], color=hue[3])
+            axs[1].plot(time * 1000, result[0], color=hue[0], label='left')
+            axs[1].plot(time * 1000, result[1], color=hue[1], label='up')
+            axs[1].plot(time * 1000, result[2], color=hue[2], label='right')
+            axs[1].plot(time * 1000, result[3], color=hue[3], label='down')
         result_softmax = softmax(result, axis=0)
 
         left_con.append(result_softmax[0])
@@ -326,12 +327,15 @@ for cprime in [contrast]:
         right_con.append(result_softmax[2])
         down_con.append(result_softmax[3])
 
+    axs[0].set(xlabel='Time(ms)', ylabel='Motion Energy')
 
     #plt.xlabel('Time(ms)')
     #plt.ylabel('Firing rate(Hz)')
-    axs[1].set(xlabel='Time(ms)', ylabel='Time(ms)')
+    axs[1].set(xlabel='Time(ms)', ylabel='Firing Rate')
+    axs[2].set_xlim(-500, 500)
     #plt.title('Contrast-' + str(cprime) + ' Iteration-' + str(iter) + ' Firing Rate')
     # plt.text(-125, 16, 'Threshold')
+    axs[2].set(xlabel='Time(ms)', ylabel='Probability')
 
 
 
