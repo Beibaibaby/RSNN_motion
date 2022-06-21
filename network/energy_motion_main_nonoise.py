@@ -11,7 +11,7 @@ from scipy.optimize import curve_fit
 Je = 0.3103
 Jot = -0.007
 Jop = -0.046
-contrast = 0.99
+contrast = 0.05
 sum_plot=0
 #3 decision with smoothing
 cov=True
@@ -329,7 +329,8 @@ for cprime in [contrast]:
 
     #plt.xlabel('Time(ms)')
     #plt.ylabel('Firing rate(Hz)')
-    axs[1].set(xlabel='Time(ms)', ylabel='Time(ms)')
+    axs[1].set_xlabel('Time(ms)', fontsize=20)
+    axs[1].set_ylabel('Firing Rate', fontsize=20)
     #plt.title('Contrast-' + str(cprime) + ' Iteration-' + str(iter) + ' Firing Rate')
     # plt.text(-125, 16, 'Threshold')
 
@@ -362,6 +363,8 @@ for cprime in [contrast]:
     axs[2].fill_between(time * 1000, up_mean - up_var, up_mean + up_var, color=hue[1], alpha=0.3)
     axs[2].fill_between(time * 1000, right_mean - right_var, right_mean + right_var, color=hue[2], alpha=0.3)
     axs[2].fill_between(time * 1000, down_mean - down_var, down_mean + down_var, color=hue[3], alpha=0.3)
+    axs[2].set_xlabel('Time(ms)', fontsize=20)
+    axs[2].set_ylabel('Probability', fontsize=20)
     # plt.plot(time * 1000, 15 * np.ones(steps))
     #.xlabel('Time(ms)')
     #plt.ylabel('Pro')
