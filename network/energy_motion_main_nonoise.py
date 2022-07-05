@@ -14,7 +14,7 @@ Jop = -0.046
 contrast = 0.05
 sum_plot=0
 #3 decision with smoothing
-cov=True
+cov=False
 check=False
 check_reverse=False
 iter=1
@@ -99,6 +99,12 @@ axs[0].plot([0 + x for x in range(350)], left, color=hue[0], label='left')
 axs[0].plot([0 + x for x in range(350)], up, color=hue[1],label='up')
 axs[0].plot([0 + x for x in range(350)], right, color=hue[2] ,label='right')
 axs[0].plot([0 + x for x in range(350)], down, color=hue[3] ,label='down')
+
+inputfile=np.asarray([left,up,right,down])
+
+np.save('./plotscripts/results_lowcontrast_smallsize/input',inputfile)
+
+
 
 axs[0].set(xlabel='x-label', ylabel='y-label')
 # plt.ylim(0,20)
@@ -287,7 +293,7 @@ for cprime in [contrast]:
         print(i)
         result = experiment(cprime)
         result = np.asarray(result)
-
+        np.save('./data_plot/resultdata_lowcontrast_smallsize',result)
 
         print(result.shape)
         result1=result[:,:4000]

@@ -92,6 +92,8 @@ plt.figure
 
 fig, axs = plt.subplots(3)
 fig.set_size_inches(10.5, 18.5)
+
+
 axs[0].plot([0 + x for x in range(350)], left, color=hue[0], label='left')
 axs[0].plot([0 + x for x in range(350)], up, color=hue[1],label='up')
 axs[0].plot([0 + x for x in range(350)], right, color=hue[2] ,label='right')
