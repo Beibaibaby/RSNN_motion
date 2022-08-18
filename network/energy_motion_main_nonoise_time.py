@@ -14,7 +14,7 @@ Jop = -0.046
 contrast = 0.05
 sum_plot=0
 #3 decision with smoothing
-cov=True
+cov=False
 check=False
 check_reverse=False
 iter=1
@@ -55,8 +55,8 @@ def convolve(x,covk):
 
 def input_function(R_max, c_1,c_2,cprime):
     ratio = objective([0 + x for x in range(350)], R_max, c_1,c_2)
-    right = cprime*ratio*0.8*60
-    left = cprime * (1 - ratio) * 0.8 * 60
+    right =cprime**0.18 *ratio*0.8*60
+    left = cprime**0.18 * (1 - ratio) * 0.8 * 60
     if cov==True:
       cov_c = np.asarray([0.1, 0.097, 0.089, 0.083, 0.08, 0.076, 0.088, 0.089, 0.092, 0.1])
     #left = cprime * (1 - ratio) * 0.9 * 60
@@ -73,8 +73,8 @@ def input_function(R_max, c_1,c_2,cprime):
       #for i in range(100):
       #    left[60 + i] = left[200]
 
-    up = cprime*0.1*(np.zeros(left.shape)+1)*60
-    down = cprime*0.1*(np.zeros(left.shape)+1)*60
+    up = cprime**0.18*0.1*(np.zeros(left.shape)+1)*60
+    down = cprime**0.18*0.1*(np.zeros(left.shape)+1)*60
     #print(right)
     return left,right,up,down
 
@@ -332,7 +332,8 @@ for cprime in [contrast]:
         right_con.append(result_softmax[2])
         down_con.append(result_softmax[3])
 
-
+    axs[0].set_xlabel('Time(ms)', fontsize=20)
+    axs[0].set_ylabel('Input Energy', fontsize=20)
     #plt.xlabel('Time(ms)')
     #plt.ylabel('Firing rate(Hz)')
     axs[1].set_xlabel('Time(ms)', fontsize=20)
