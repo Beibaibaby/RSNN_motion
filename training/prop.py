@@ -16,6 +16,9 @@ from scipy.optimize import curve_fit
 Je = 0.3103
 Jot = -0.007
 Jop = -0.046
+#Je=0.2457390361489831
+#ot=-0.09740548828156387
+#Jop=-0.11075003585655539
 
 contrast = 0.99
 sum_plot=0
@@ -399,7 +402,7 @@ def loss_function(result,gt):
 
     weight_left = result_left/(result_left+result_right)
     weight_right = result_right/(result_left+result_right)
-    mse = np.mean(np.multiply(np.square(result_left - gt_left),weight_left)+np.multiply(np.square(result_right - gt_right),weight_right))
+    mse = np.mean(np.multiply(np.square(result_left - gt_left),weight_right)+np.multiply(np.square(result_right - gt_right),weight_left))
 
     return mse
 
@@ -411,6 +414,7 @@ def simulate(cprime,gt,Je,Jot,Jop):
     right_con = []
     down_con = []
     result = experiment_train(cprime,Je,Jot,Jop)
+    result = softmax(result, axis=0)
     result = np.asarray(result)
     result1 = result[:, :4000]
     result2 = result[:, 4000:]
@@ -462,16 +466,16 @@ def compute_gradient(contrast_list,gt,Je,Jot,Jop,spacesize):
     return gradient_Je, gradient_Jot, gradient_Jop
 #gradient_Je, gradient_Jot, gradient_Jop=compute_gradient([0.99],gt_high_contrast,Je,Jot,Jop,0.0001)
 def do_it(contrast_list,gt,Je,Jot,Jop,spacesize):
-    for i in range(1000):
+    for i in range(10000):
         print('iter'+str(i))
         print('Je='+str(Je))
         print('Jot=' + str(Jot))
         print('Jop=' + str(Jop))
         print('loss:'+str(simulate(contrast_list[0],gt,Je,Jot,Jop)))
         gradient_Je, gradient_Jot, gradient_Jop = compute_gradient(contrast_list,gt,Je,Jot,Jop,spacesize)
-        Je=Je-0.1*spacesize*gradient_Je
-        Jot=Jot-0.1*spacesize*gradient_Jot
-        Jop = Jop - 0.1*spacesize * gradient_Jop
+        Je=Je-10*spacesize*gradient_Je
+        Jot=Jot-10*spacesize*gradient_Jot
+        Jop = Jop - 10*spacesize * gradient_Jop
 
         para=[Je,Jot,Jop]
         para=np.asarray(para)
