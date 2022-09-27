@@ -20,7 +20,7 @@ Jop = -0.046
 contrast = 0.99
 sum_plot=0
 #3 decision with smoothing
-cov=False
+cov=True
 check=False
 check_reverse=False
 iter=1
@@ -463,20 +463,21 @@ def compute_gradient(contrast_list,gt,Je,Jot,Jop,spacesize):
 #gradient_Je, gradient_Jot, gradient_Jop=compute_gradient([0.99],gt_high_contrast,Je,Jot,Jop,0.0001)
 def do_it(contrast_list,gt,Je,Jot,Jop,spacesize):
     for i in range(1000):
-        gradient_Je, gradient_Jot, gradient_Jop = compute_gradient(contrast_list,gt,Je,Jot,Jop,spacesize)
-        Je=Je-spacesize*gradient_Je
-        Jot=Jot-spacesize*gradient_Jot
-        Jop = Jop - spacesize * gradient_Jop
         print('iter'+str(i))
         print('Je='+str(Je))
         print('Jot=' + str(Jot))
         print('Jop=' + str(Jop))
         print('loss:'+str(simulate(contrast_list[0],gt,Je,Jot,Jop)))
+        gradient_Je, gradient_Jot, gradient_Jop = compute_gradient(contrast_list,gt,Je,Jot,Jop,spacesize)
+        Je=Je-0.1*spacesize*gradient_Je
+        Jot=Jot-0.1*spacesize*gradient_Jot
+        Jop = Jop - 0.1*spacesize * gradient_Jop
+
         para=[Je,Jot,Jop]
         para=np.asarray(para)
         np.save('para',para)
 
-do_it([0.99],gt_high_contrast,Je,Jot,Jop,0.0001)
+do_it([0.99],gt_high_contrast,Je,Jot,Jop,0.00005)
 
 hue = ['orange', 'red', 'blue', 'green']
 

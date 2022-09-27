@@ -8,13 +8,20 @@ from scipy.optimize import curve_fit
 
 
 
-Je = 0.3063#0.3103
-Jot = -0.007
-Jop = -0.046
+#Je = 0.3063#0.3103
+#Jot = -0.007
+#Jop = -0.046
+#Je = 0.10131513081866061#0.3103
+#Jot = -0.2797913606649004
+#Jop = -0.22369888970508417
+Je=0.29262529060722825
+Jot=-0.03245678022082578
+Jop=-0.06363453686124179
+
 contrast = 0.99
 sum_plot=0
 #3 decision with smoothing
-cov=False
+cov=True
 check=False
 check_reverse=False
 iter=1
