@@ -413,8 +413,8 @@ def simulate(cprime,gt,Je,Jot,Jop):
     up_con = []
     right_con = []
     down_con = []
-    result = experiment_train(cprime,Je,Jot,Jop)
-    result = softmax(result, axis=0)
+    result_t = experiment_train(cprime,Je,Jot,Jop)
+    result = softmax(result_t, axis=0)
     result = np.asarray(result)
     result1 = result[:, :4000]
     result2 = result[:, 4000:]
@@ -424,10 +424,34 @@ def simulate(cprime,gt,Je,Jot,Jop):
     #-400ms to 350ms
     result = result[:,4000:7501]
 
-    loss = loss_function(result, gt)
+    loss = loss_function(result, gt)+simulate_2(cprime,Je,Jot,Jop)
     #print('loss')
     #print(loss)
     return loss
+
+def simulate_2(cprime,Je,Jot,Jop):
+    from scipy.special import softmax
+
+    left_con = []
+    up_con = []
+    right_con = []
+    down_con = []
+    result = experiment_train(cprime,Je,Jot,Jop)
+
+    result = np.asarray(result)
+    result1 = result[:, :4000]
+    result2 = result[:, 4000:]
+    for idd in range(4):
+        result2[idd] = smoothing(result2[idd])
+    result = np.concatenate((result1, result2), axis=1)
+    #-400ms to 350ms
+    result = result[:,4000:7501]
+    loss = result[0,3000]
+
+    #print('loss')
+    #print(loss)
+    return loss
+
 
 def compute_gradient(contrast_list,gt,Je,Jot,Jop,spacesize):
     cprime = contrast_list[0]
